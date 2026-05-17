@@ -236,8 +236,6 @@ STRYX is built for **security research and educational purposes only**. Do not u
 **Chenchu** · Silent Storm
 
 - 🐙 GitHub: [@chenchu-code](https://github.com/chenchu-code)
-- 📺 YouTube: [T Max Gaming](https://youtube.com)
-- 📸 Instagram: [@the.silentstorm](https://instagram.com/the.silentstorm)
 
 ---
 
