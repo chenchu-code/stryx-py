@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<meta name="description" content="STRYX — Email & URL Threat Analyzer. Detect phishing instantly. Free SOC tool by Silent Storm."/>
+<meta property="og:title" content="STRYX — Threat Analyzer"/>
+<meta property="og:description" content="Detect phishing before it reaches you. Free, offline, no API key."/>
+<meta name="theme-color" content="#080b0f"/>
+<title>STRYX — Email & URL Threat Analyzer</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:#3dff8f44}
+:root{
+  --bg:#080b0f;--surface:#0d1117;--card:#111620;--border:#1c2a3a;
+  --green:#3dff8f;--cyan:#00d4ff;--yellow:#f5c842;--red:#ff1f44;--orange:#ff6b00;
+  --muted:#3d5060;--sub:#6a8a7a;--text:#c5d8c5;--white:#eef4ee;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:radial-gradient(circle at 15% 15%,#3dff8f07 0%,transparent 45%),linear-gradient(#3dff8f03 1px,transparent 1px),linear-gradient(90deg,#3dff8f03 1px,transparent 1px);
+  background-size:100% 100%,52px 52px,52px 52px}
+.wrap{position:relative;z-index:1;max-width:920px;margin:0 auto;padding:0 20px}
+nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;cursor:pointer;text-decoration:none}
+.logo-dot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green)}
+.logo-text{color:var(--green);font-weight:900;font-size:18px;letter-spacing:.14em}
+.nav-tabs{display:flex;gap:2px;background:var(--surface);padding:4px;border-radius:10px;border:1px solid var(--border)}
+.nav-tab{padding:7px 16px;border-radius:7px;border:none;cursor:pointer;font-weight:700;font-size:11px;letter-spacing:.12em;background:transparent;color:var(--sub);transition:all .18s}
+.nav-tab.active{background:var(--green);color:var(--bg)}
+.nav-count{color:var(--muted);font-size:11px;font-family:monospace}
+.view{display:none;padding:32px 0 80px}
+.view.active{display:block}
+/* HOME */
+.hero{padding:60px 0 48px;max-width:680px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.chip{display:inline-block;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.07em;background:#3dff8f18;color:var(--green);border:1px solid #3dff8f30}
+.chip.c{background:#00d4ff18;color:var(--cyan);border-color:#00d4ff30}
+.chip.s{background:#6a8a7a18;color:var(--sub);border-color:#6a8a7a30}
+h1{font-size:clamp(32px,6vw,58px);font-weight:900;color:var(--white);line-height:1.04;letter-spacing:-.03em;margin-bottom:20px}
+h1 span{color:var(--green);text-shadow:0 0 40px #3dff8f44}
+.hero p{color:var(--sub);font-size:17px;line-height:1.7;max-width:520px;margin-bottom:32px}
+.btns{display:flex;flex-wrap:wrap;gap:12px}
+.btn-p{padding:14px 32px;background:var(--green);color:var(--bg);border-radius:10px;border:none;font-weight:800;font-size:15px;cursor:pointer;box-shadow:0 0 32px #3dff8f44;letter-spacing:.04em;transition:all .2s;text-decoration:none;display:inline-block}
+.btn-p:hover{background:#5fffaa;box-shadow:0 0 40px #3dff8f66}
+.btn-s{padding:14px 28px;background:transparent;color:var(--sub);border-radius:10px;border:1px solid var(--border);font-weight:700;font-size:14px;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center}
+.btn-s:hover{border-color:var(--sub);color:var(--text)}
+.stats{display:flex;flex-wrap:wrap;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:64px}
+.stat{flex:1;min-width:130px;padding:24px 20px;text-align:center;border-right:1px solid var(--border)}
+.stat:last-child{border-right:none}
+.sv{color:var(--green);font-size:26px;font-weight:900;letter-spacing:-.02em}
+.sl{color:var(--muted);font-size:12px;margin-top:4px}
+.sec{margin-bottom:64px}
+.eyebrow{color:var(--green);font-size:13px;font-weight:700;letter-spacing:.18em;margin-bottom:10px}
+.sec h2{font-size:clamp(22px,4vw,34px);font-weight:900;color:var(--white);letter-spacing:-.02em;margin-bottom:28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px}
+.card h3{color:var(--white);font-size:15px;font-weight:700;margin-bottom:8px}
+.card p{color:var(--sub);font-size:13px;line-height:1.65}
+.ci{color:var(--green);font-size:20px;font-weight:900;margin-bottom:10px}
+.step{position:relative;overflow:hidden}
+.snum{color:var(--green);font-size:22px;font-weight:900;margin-bottom:10px}
+.sbg{position:absolute;top:16px;right:20px;font-size:36px;font-weight:900;color:#3dff8f11;letter-spacing:-.04em}
+.cta{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 32px;text-align:center;margin-bottom:40px}
+.cta h2{font-size:clamp(20px,4vw,30px);font-weight:900;color:var(--white);letter-spacing:-.02em;margin-bottom:12px}
+.cta p{color:var(--sub);font-size:14px;margin-bottom:24px}
+/* SCAN */
+.ph{margin-bottom:28px}
+.ph h2{font-size:clamp(24px,5vw,36px);font-weight:900;color:var(--white);letter-spacing:-.02em;margin-bottom:6px}
+.ph p{color:var(--sub);font-size:14px}
+.mtog{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.mbtn{padding:10px 28px;border-radius:10px;border:1px solid var(--border);cursor:pointer;font-weight:700;font-size:12px;letter-spacing:.12em;background:transparent;color:var(--sub);transition:all .18s}
+.mbtn.active{border-color:var(--green);background:#3dff8f18;color:var(--green)}
+.ilbl{color:var(--green);font-size:11px;letter-spacing:.15em;margin-bottom:8px;font-weight:700}
+input.ui,textarea.ui{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--white);padding:15px 18px;font-family:'SF Mono','Fira Code',monospace;font-size:14px;border-radius:10px;outline:none;caret-color:var(--green);transition:border-color .2s;margin-bottom:10px}
+input.ui:focus,textarea.ui:focus{border-color:#3dff8f88;box-shadow:0 0 0 3px #3dff8f11}
+textarea.ui{resize:vertical;line-height:1.7;min-height:160px}
+.srow{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;align-items:center}
+.slbl{color:var(--muted);font-size:11px;font-weight:600;letter-spacing:.1em}
+.sbtn{background:var(--surface);border:1px solid var(--border);color:var(--sub);padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;transition:border-color .15s}
+.sbtn:hover{border-color:var(--sub);color:var(--text)}
+.cbtn{background:transparent;border:1px solid #3a1e1e;color:#ff556688;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer}
+.abtn{width:100%;padding:16px;border-radius:12px;border:none;background:var(--green);color:var(--bg);font-weight:800;font-size:15px;letter-spacing:.08em;cursor:pointer;box-shadow:0 0 32px #3dff8f33;transition:all .25s;margin-bottom:28px}
+.abtn:disabled{background:var(--surface);color:var(--green);border:1px solid #3dff8f33;opacity:.6;cursor:not-allowed;box-shadow:none}
+.abtn:hover:not(:disabled){background:#5fffaa;box-shadow:0 0 40px #3dff8f55}
+.res{animation:rise .3s ease}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.rctrl{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.ltog{display:flex;gap:3px;background:var(--surface);padding:4px;border-radius:10px;border:1px solid var(--border)}
+.lbtn{padding:7px 18px;border-radius:7px;border:none;cursor:pointer;font-weight:700;font-size:11px;letter-spacing:.1em;background:transparent;color:var(--sub);transition:all .18s}
+.abtns{display:flex;gap:8px}
+.ibtn{background:var(--surface);border:1px solid var(--border);color:var(--sub);padding:8px 16px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;transition:color .2s}
+.ibtn.cp{color:var(--green)}
+.vc{border-radius:12px;padding:24px;margin-bottom:14px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.srw{position:relative;width:100px;height:100px;flex-shrink:0}
+.srw svg{transform:rotate(-90deg)}
+.sc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.sn{font-size:24px;font-weight:900;line-height:1}
+.sk{color:var(--muted);font-size:9px;letter-spacing:.15em;margin-top:1px}
+.vi{flex:1;min-width:200px}
+.vl{font-size:26px;font-weight:900;letter-spacing:-.01em;margin-bottom:10px}
+.vt{font-size:14px;line-height:1.65}
+.slb{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.slb::before{content:'⟩';color:var(--green);font-size:13px;font-weight:700}
+.slb span{color:var(--sub);font-size:10px;font-weight:700;letter-spacing:.18em}
+.il{display:flex;flex-direction:column;gap:8px}
+.ii{display:flex;align-items:flex-start;gap:14px;padding:12px 14px;background:var(--bg);border-radius:8px}
+.ic{flex:1}
+.ih{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.it{color:var(--sub);font-size:10px;font-weight:700;letter-spacing:.14em}
+.sc2{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700}
+.id{color:var(--text);font-size:13px;line-height:1.5}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mv{color:var(--yellow);font-size:13px;font-family:monospace;line-height:1.6}
+.av{color:var(--white);font-size:14px;line-height:1.7}
+/* DASHBOARD */
+.scards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.scard{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px 24px;flex:1;min-width:110px}
+.scv{font-size:30px;font-weight:900;line-height:1;letter-spacing:-.02em;margin-bottom:4px}
+.empty{text-align:center;padding:80px 0;color:var(--muted)}
+.ei{font-size:48px;opacity:.3;margin-bottom:16px}
+.et{font-size:16px;font-weight:700;color:var(--sub);margin-bottom:8px}
+.ri{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:8px;flex-wrap:wrap}
+.rin{color:var(--text);font-size:12px;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:80px}
+.rt{color:var(--muted);font-size:10px;font-family:monospace;white-space:nowrap}
+/* HISTORY */
+.hi{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 20px;margin-bottom:8px}
+.hh{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.hix{color:var(--muted);font-size:10px;font-family:monospace}
+.hin{color:var(--sub);font-size:11px;font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-bottom:5px}
+.hsi{color:var(--text);font-size:13px;line-height:1.5}
+.hm{color:#f5c84277;font-size:11px;font-family:monospace;margin-top:4px}
+.htm{color:var(--muted);font-size:10px;font-family:monospace;margin-left:auto}
+.dlb{background:transparent;border:1px solid var(--border);color:var(--sub);padding:5px 12px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;margin-top:8px;transition:color .2s}
+.dlb:hover{color:var(--green);border-color:var(--green)}
+footer{border-top:1px solid var(--border);padding:24px 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-top:20px}
+footer a{color:var(--sub);font-size:12px;font-weight:600;text-decoration:none}
+footer a:hover{color:var(--green)}
+.fm{color:var(--muted);font-size:11px}
+.hid{display:none!important}
+.mt8{margin-top:8px}.mb12{margin-bottom:12px}
+@media(max-width:600px){.two{grid-template-columns:1fr}.stats{flex-direction:column}.stat{border-right:none;border-bottom:1px solid var(--border)}.stat:last-child{border-bottom:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <div class="logo" onclick="sv('home')"><div class="logo-dot"></div><span class="logo-text">STRYX</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-v="home">HOME</button>
+    <button class="nav-tab" data-v="scan">SCAN</button>
+    <button class="nav-tab" data-v="dashboard">DASHBOARD</button>
+    <button class="nav-tab" data-v="history">HISTORY</button>
+  </div>
+  <span class="nav-count" id="nc"></span>
+</nav>
+
+<!-- HOME -->
+<div class="view active" id="v-home">
+  <div class="hero">
+    <div class="chips">
+      <span class="chip">FREE · OPEN SOURCE</span>
+      <span class="chip c">NO API KEY</span>
+      <span class="chip s">PYTHON BACKEND</span>
+    </div>
+    <h1>Detect phishing<br><span>before it reaches you.</span></h1>
+    <p>STRYX analyzes URLs and emails for phishing, spoofing, and social engineering — instantly, privately, and for free. No account. No tracking.</p>
+    <div class="btns">
+      <button class="btn-p" onclick="sv('scan')">Try STRYX Free →</button>
+      <a class="btn-s" href="https://github.com/chenchu-code/stryx-py" target="_blank">GitHub ↗</a>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="sv">20+</div><div class="sl">Detection Rules</div></div>
+    <div class="stat"><div class="sv">&lt;1s</div><div class="sl">Scan Speed</div></div>
+    <div class="stat"><div class="sv">0</div><div class="sl">API Keys Needed</div></div>
+    <div class="stat"><div class="sv">100%</div><div class="sl">Private & Offline</div></div>
+  </div>
+  <div class="sec">
+    <div class="eyebrow">⟩ HOW IT WORKS</div>
+    <h2>Three steps to a verdict.</h2>
+    <div class="grid3">
+      <div class="card step"><div class="sbg">01</div><div class="snum">01</div><h3>Paste</h3><p>Drop in any suspicious URL or paste the full email text you want to analyze.</p></div>
+      <div class="card step"><div class="sbg">02</div><div class="snum">02</div><h3>Scan</h3><p>STRYX runs 20+ heuristic rules instantly — no API calls, no internet needed.</p></div>
+      <div class="card step"><div class="sbg">03</div><div class="snum">03</div><h3>Act</h3><p>Get a clear verdict, threat indicators, MITRE mapping, and analyst action to take.</p></div>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="eyebrow">⟩ FEATURES</div>
+    <h2>Built for real SOC work.</h2>
+    <div class="grid">
+      <div class="card"><div class="ci">⟩</div><h3>URL Analysis</h3><p>12 rules covering lookalike domains, IP hosts, suspicious TLDs, obfuscation, homoglyphs, and more.</p></div>
+      <div class="card"><div class="ci">⟩</div><h3>Email Analysis</h3><p>8 rules covering spoofed senders, urgency language, credential requests, phishing links, payment scams.</p></div>
+      <div class="card"><div class="ci">⟩</div><h3>MITRE ATT&amp;CK</h3><p>Every threat mapped to a real technique ID — T1566, T1598, T1657, T1071.</p></div>
+      <div class="card"><div class="ci">⟩</div><h3>Simple &amp; Advanced</h3><p>Plain-English verdict for non-technical users + full technical breakdown for analysts.</p></div>
+      <div class="card"><div class="ci">⟩</div><h3>Report Export</h3><p>Download a professional incident report from any scan — ready to attach to a ticket.</p></div>
+      <div class="card"><div class="ci">⟩</div><h3>Python Backend</h3><p>Built with Flask — real server-side detection, zero frontend dependencies.</p></div>
+    </div>
+  </div>
+  <div class="cta">
+    <div class="eyebrow" style="margin-bottom:12px">⟩ GET STARTED</div>
+    <h2>Analyze your first threat now.</h2>
+    <p>No sign-up. No install. Works in your browser right now.</p>
+    <button class="btn-p" onclick="sv('scan')">Open STRYX →</button>
+  </div>
+</div>
+
+<!-- SCAN -->
+<div class="view" id="v-scan">
+  <div class="ph"><h2>Threat Scanner</h2><p>Paste a URL or email to analyze for phishing and social engineering.</p></div>
+  <div class="mtog">
+    <button class="mbtn active" id="ub" onclick="sm('URL')">URL SCAN</button>
+    <button class="mbtn" id="eb" onclick="sm('EMAIL')">EMAIL SCAN</button>
+  </div>
+  <div id="ui"><div class="ilbl">&gt; PASTE TARGET URL</div>
+    <input type="text" class="ui" id="uf" placeholder="Paste URL here — e.g. https://paypa1-login.xyz/verify" maxlength="2000" onkeydown="if(event.key==='Enter')da()"/></div>
+  <div id="ei" class="hid"><div class="ilbl">&gt; PASTE EMAIL CONTENT</div>
+    <textarea class="ui" id="ef" placeholder="From: security@paypa1-support.com&#10;Subject: URGENT!&#10;&#10;Paste full email here…" maxlength="5000"></textarea></div>
+  <div class="srow" id="us">
+    <span class="slbl">TRY A SAMPLE</span>
+    <button class="sbtn" onclick="ls('url',0)">Sample 1</button>
+    <button class="sbtn" onclick="ls('url',1)">Sample 2</button>
+    <button class="sbtn" onclick="ls('url',2)">Sample 3</button>
+    <button class="sbtn" onclick="ls('url',3)">Safe URL</button>
+    <button class="cbtn hid" id="cb" onclick="ci()">Clear ×</button>
+  </div>
+  <div class="srow hid" id="es">
+    <span class="slbl">TRY A SAMPLE</span>
+    <button class="sbtn" onclick="ls('email',0)">Sample 1</button>
+    <button class="sbtn" onclick="ls('email',1)">Sample 2</button>
+    <button class="sbtn" onclick="ls('email',2)">Safe Email</button>
+    <button class="cbtn hid" id="cbe" onclick="ci()">Clear ×</button>
+  </div>
+  <button class="abtn" id="ab" onclick="da()">⟩ Analyze URL</button>
+  <div id="res" class="hid res"></div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="view" id="v-dashboard">
+  <div class="ph"><h2>Dashboard</h2><p>Your scan history and threat patterns.</p></div>
+  <div id="dc"></div>
+</div>
+
+<!-- HISTORY -->
+<div class="view" id="v-history"><div id="hc"></div></div>
+
+<footer>
+  <div class="logo"><div class="logo-dot"></div><span class="logo-text">STRYX</span></div>
+  <span class="fm">v1.0 · Email &amp; URL Threat Analyzer · Silent Storm · Open Source</span>
+  <a href="https://github.com/chenchu-code/stryx-py" target="_blank">GitHub ↗</a>
+</footer>
+</div>
+
+<script>
+const SMP={
+  url:["http://paypa1-secure-login.xyz/verify?user=account&token=8fx2k","https://amaz0n-support.tk/account-suspended/login.php","http://192.168.1.1/admin/update-credentials","https://www.google.com"],
+  email:["From: security@paypa1-alerts.com\nSubject: URGENT: Your account will be suspended!\n\nDear Valued Customer,\nVerify immediately: http://paypa1-secure.xyz/verify\n\nPayPal Security Team","From: noreply@gooogle-account-security.com\nSubject: Sign-in attempt blocked!\n\nClick IMMEDIATELY: http://g00gle-security-alert.tk/protect\n\nGoogle Security","From: hr@company.com\nSubject: Team lunch Friday\n\nHi team, lunch at 1 PM Friday. See you there!"]
+};
+const SC={CRITICAL:"#ff1f44",HIGH:"#ff6b00",MEDIUM:"#f5c842",LOW:"#3dff8f",SAFE:"#00d4ff"};
+const SE={CRITICAL:"🔴",HIGH:"🟠",MEDIUM:"🟡",LOW:"🟢",SAFE:"🔵"};
+let mode="URL",hist=JSON.parse(localStorage.getItem("stryx-h")||"[]"),cur=null,lvl="SIMPLE";
+
+function sv(n){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.querySelectorAll(".nav-tab").forEach(t=>t.classList.remove("active"));
+  document.getElementById("v-"+n).classList.add("active");
+  document.querySelector(`[data-v="${n}"]`).classList.add("active");
+  if(n==="dashboard")rd();
+  if(n==="history")rh();
+}
+document.querySelectorAll(".nav-tab").forEach(t=>t.addEventListener("click",()=>sv(t.dataset.v)));
+
+function sm(m){
+  mode=m;
+  document.getElementById("ub").classList.toggle("active",m==="URL");
+  document.getElementById("eb").classList.toggle("active",m==="EMAIL");
+  document.getElementById("ui").classList.toggle("hid",m!=="URL");
+  document.getElementById("ei").classList.toggle("hid",m!=="EMAIL");
+  document.getElementById("us").classList.toggle("hid",m!=="URL");
+  document.getElementById("es").classList.toggle("hid",m!=="EMAIL");
+  document.getElementById("ab").textContent=`⟩ Analyze ${m}`;
+  document.getElementById("res").classList.add("hid");
+  cur=null;
+}
+
+function ls(t,i){
+  if(t==="url")document.getElementById("uf").value=SMP.url[i];
+  else document.getElementById("ef").value=SMP.email[i];
+  document.getElementById("cb").classList.remove("hid");
+  document.getElementById("cbe").classList.remove("hid");
+  document.getElementById("res").classList.add("hid");
+  cur=null;
+}
+
+function ci(){
+  document.getElementById("uf").value="";
+  document.getElementById("ef").value="";
+  document.getElementById("cb").classList.add("hid");
+  document.getElementById("cbe").classList.add("hid");
+  document.getElementById("res").classList.add("hid");
+  cur=null;
+}
+
+async function da(){
+  const inp=mode==="URL"?document.getElementById("uf").value.trim():document.getElementById("ef").value.trim();
+  if(!inp){alert("Please paste a URL or email first.");return;}
+  const btn=document.getElementById("ab");
+  btn.disabled=true;btn.textContent="⟩ Scanning…";
+  try{
+    const r=await fetch("/analyze",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({mode,input:inp})});
+    const d=await r.json();
+    cur=d;lvl="SIMPLE";
+    hist.unshift(d);
+    if(hist.length>50)hist=hist.slice(0,50);
+    localStorage.setItem("stryx-h",JSON.stringify(hist));
+    unc();rr(d);
+  }catch(e){alert("Analysis failed. Please try again.");}
+  finally{btn.disabled=false;btn.textContent=`⟩ Analyze ${mode}`;}
+}
+
+function rr(r){
+  const vc=SC[r.verdict]||"#3dff8f";
+  const ci=2*Math.PI*38,da=(r.score/100)*ci;
+  const ih=r.indicators?.length?r.indicators.map(i=>`
+    <div class="ii" style="border-left:3px solid ${SC[i.sev]||'#334'}">
+      <div class="ic">
+        <div class="ih"><span class="it">${i.type}</span>
+          <span class="sc2" style="background:${SC[i.sev]||'#334'}22;color:${SC[i.sev]||'#334'};border:1px solid ${SC[i.sev]||'#334'}44">${i.sev}</span>
+        </div>
+        <div class="id">${i.detail}</div>
+      </div>
+    </div>`).join(""):
+    `<div class="card" style="border-color:${vc}44"><span style="color:var(--white);font-size:14px">No threat indicators triggered. All checks passed.</span></div>`;
+  const mc=r.mitre?`<div class="card"><div class="slb"><span>MITRE ATT&CK</span></div><div class="mv">${r.mitre}</div></div>`:"";
+
+  document.getElementById("res").innerHTML=`
+    <div class="rctrl">
+      <div class="ltog">
+        <button class="lbtn" id="slb" onclick="sl('SIMPLE')" style="background:${vc};color:var(--bg)">SIMPLE</button>
+        <button class="lbtn" id="alb" onclick="sl('ADVANCED')">ADVANCED</button>
+      </div>
+      <div class="abtns">
+        <button class="ibtn" onclick="er()">⟩ Download Report</button>
+        <button class="ibtn" id="cpb" onclick="cr()">Copy Report</button>
+      </div>
+    </div>
+    <div class="vc card" style="border-color:${vc}44;background:linear-gradient(135deg,${vc}0d,var(--card));box-shadow:0 0 40px ${vc}0a">
+      <div class="srw">
+        <svg width="100" height="100">
+          <circle cx="50" cy="50" r="38" fill="none" stroke="var(--card)" stroke-width="7"/>
+          <circle cx="50" cy="50" r="38" fill="none" stroke="${vc}" stroke-width="7"
+            stroke-dasharray="${da} ${ci}" stroke-linecap="round"
+            style="filter:drop-shadow(0 0 8px ${vc}88);transition:stroke-dasharray .9s cubic-bezier(.4,0,.2,1)"/>
+        </svg>
+        <div class="sc"><span class="sn" style="color:${vc}">${r.score}</span><span class="sk">RISK</span></div>
+      </div>
+      <div class="vi">
+        <div class="vl" style="color:${vc};text-shadow:0 0 20px ${vc}66">${SE[r.verdict]} ${r.verdict}</div>
+        <div class="vt" id="vt" style="color:var(--white);font-size:15px">${r.simple}</div>
+      </div>
+    </div>
+    <div id="sv2" class="card"><div class="slb"><span>RECOMMENDED ACTION</span></div><div class="av">${r.action}</div></div>
+    <div id="av2" class="hid">
+      <div class="card mb12"><div class="slb"><span>THREAT INDICATORS — ${r.indicators?.length||0} FOUND</span></div><div class="il">${ih}</div></div>
+      <div class="${r.mitre?'two':''}">
+        ${mc}
+        <div class="card"><div class="slb"><span>ANALYST ACTION</span></div><div class="av">${r.action}</div></div>
+      </div>
+    </div>`;
+  document.getElementById("res").classList.remove("hid");
+  document.getElementById("res").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+function sl(l){
+  lvl=l;const vc=SC[cur?.verdict]||"#3dff8f";
+  const sb=document.getElementById("slb"),ab=document.getElementById("alb");
+  sb.style.background=l==="SIMPLE"?vc:"transparent";sb.style.color=l==="SIMPLE"?"var(--bg)":"var(--sub)";
+  ab.style.background=l==="ADVANCED"?vc:"transparent";ab.style.color=l==="ADVANCED"?"var(--bg)":"var(--sub)";
+  document.getElementById("sv2").classList.toggle("hid",l!=="SIMPLE");
+  document.getElementById("av2").classList.toggle("hid",l!=="ADVANCED");
+  if(cur){
+    const vt=document.getElementById("vt");
+    vt.textContent=l==="SIMPLE"?cur.simple:cur.summary;
+    vt.style.fontSize=l==="SIMPLE"?"15px":"13px";
+    vt.style.color=l==="SIMPLE"?"var(--white)":"var(--text)";
+  }
+}
+
+function bt(r){
+  return`STRYX — THREAT ANALYSIS REPORT\n${"═".repeat(44)}\nDate     : ${r.ts}\nMode     : ${r.mode} Scan\nVerdict  : ${r.verdict} (${r.score}/100)\nSummary  : ${r.summary}\nMITRE    : ${r.mitre||"N/A"}\nAction   : ${r.action}\n\nINDICATORS:\n${r.indicators?.map(i=>`  [${i.sev}] ${i.type}: ${i.detail}`).join("\n")||"  None found."}\n\n${"─".repeat(44)}\nSTRYX v1.0 — Silent Storm\ngithub.com/chenchu-code/stryx-py`;
+}
+
+function cr(){
+  if(!cur)return;
+  navigator.clipboard.writeText(bt(cur));
+  const b=document.getElementById("cpb");
+  b.textContent="✓ Copied";b.classList.add("cp");
+  setTimeout(()=>{b.textContent="Copy Report";b.classList.remove("cp")},2000);
+}
+
+function er(r){
+  const d=r||cur;if(!d)return;
+  const a=document.createElement("a");
+  a.href="data:text/plain;charset=utf-8,"+encodeURIComponent(bt(d));
+  a.download=`stryx_report_${Date.now()}.txt`;a.click();
+}
+
+function rd(){
+  const el=document.getElementById("dc");
+  if(!hist.length){
+    el.innerHTML=`<div class="empty"><div class="ei">◈</div><div class="et">No scan data yet</div><div style="font-size:13px;margin-bottom:24px">Run scans to populate your dashboard</div><button class="btn-p" onclick="sv('scan')">Start Scanning →</button></div>`;
+    return;
+  }
+  const tot=hist.length,crits=hist.filter(h=>h.verdict==="CRITICAL").length;
+  const avg=Math.round(hist.reduce((a,h)=>a+h.score,0)/tot);
+  const last=hist[0],lc=SC[last?.verdict]||"#3dff8f";
+  const ri=hist.slice(0,5).map(h=>`
+    <div class="ri" style="border-left:3px solid ${SC[h.verdict]||'#334'}">
+      <span class="sc2" style="background:${SC[h.verdict]}22;color:${SC[h.verdict]};border:1px solid ${SC[h.verdict]}44;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">${h.verdict}</span>
+      <span style="color:${SC[h.verdict]};font-weight:700;font-size:13px;font-family:monospace">${h.score}</span>
+      <span style="color:var(--sub);font-size:10px;background:var(--card);padding:2px 7px;border-radius:5px">${h.mode}</span>
+      <span class="rin">${h.input}</span>
+      <span class="rt">${h.ts?.split(",")[1]?.trim()||""}</span>
+    </div>`).join("");
+  el.innerHTML=`
+    <div class="scards">
+      <div class="scard"><div class="slb" style="margin-bottom:10px"><span>TOTAL SCANS</span></div><div class="scv" style="color:var(--green)">${tot}</div></div>
+      <div class="scard"><div class="slb" style="margin-bottom:10px"><span>CRITICALS</span></div><div class="scv" style="color:#ff1f44">${crits}</div></div>
+      <div class="scard"><div class="slb" style="margin-bottom:10px"><span>AVG RISK</span></div><div class="scv" style="color:${avg>60?"#ff6b00":"var(--cyan)"}">${avg}</div><div style="color:var(--muted);font-size:11px;margin-top:4px">out of 100</div></div>
+      <div class="scard"><div class="slb" style="margin-bottom:10px"><span>LAST VERDICT</span></div><div class="scv" style="color:${lc};font-size:22px">${last?.verdict||"—"}</div></div>
+    </div>
+    <div class="card mt8"><div class="slb"><span>RECENT SCANS</span></div><div style="display:flex;flex-direction:column;gap:6px">${ri}</div></div>`;
+}
+
+function rh(){
+  const el=document.getElementById("hc");
+  if(!hist.length){
+    el.innerHTML=`<div class="ph"><h2>History</h2><p>No scans yet.</p></div><div class="empty"><div class="ei">◈</div><div class="et">No scans yet</div><button class="btn-p mt8" onclick="sv('scan')">Start Scanning →</button></div>`;
+    return;
+  }
+  const items=hist.map((h,i)=>`
+    <div class="hi" style="border-left:3px solid ${SC[h.verdict]||'#334'}">
+      <div class="hh">
+        <span class="hix">[${String(i+1).padStart(2,"0")}]</span>
+        <span class="sc2" style="background:${SC[h.verdict]}22;color:${SC[h.verdict]};border:1px solid ${SC[h.verdict]}44;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px">${h.verdict}</span>
+        <span style="color:${SC[h.verdict]};font-weight:700;font-size:13px;font-family:monospace">${h.score}/100</span>
+        <span style="color:var(--sub);font-size:10px;background:var(--bg);padding:2px 7px;border-radius:5px">${h.mode}</span>
+        <span class="htm">${h.ts}</span>
+      </div>
+      <div class="hin">${h.input}</div>
+      <div class="hsi">${h.simple||h.summary}</div>
+      ${h.mitre?`<div class="hm">${h.mitre}</div>`:""}
+      <button class="dlb" onclick='er(${JSON.stringify(h)})'>↓ Download Report</button>
+    </div>`).join("");
+  el.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+      <div class="ph" style="margin-bottom:0"><h2>History</h2><p>${hist.length} entries · saved in browser</p></div>
+      <button onclick="ch()" style="background:transparent;border:1px solid #3a1e1e;color:#ff556688;padding:8px 18px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer">Clear All</button>
+    </div>${items}`;
+}
+
+function ch(){
+  if(!confirm("Clear all scan history?"))return;
+  hist=[];localStorage.removeItem("stryx-h");unc();rh();
+}
+
+function unc(){
+  const el=document.getElementById("nc");
+  el.textContent=hist.length>0?`${hist.length} scans`:"";
+}
+
+unc();
+</script>
+</body>
+</html>
